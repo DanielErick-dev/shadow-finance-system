@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import GenericFormModal from '@base/components/ui/custom/GenericFormModal';
-import { useAssetsStore } from '@base/store/useAssetsStore';
+import { useAssets } from '@base/hooks/useAssets';
 import { Input } from '@base/components/ui/input';
 import { Label } from '@base/components/ui/label';
 import type { Asset } from '@base/types/assets';
@@ -17,7 +17,7 @@ export default function EditAssetModalWrapper({ assetToEdit, onClose }: EditAsse
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState<NewAssetData>({ code: '', type: 'ACAO' });
 
-    const { updateAsset } = useAssetsStore();
+    const { editAsset } = useAssets();
 
     useEffect(() => {
         if (assetToEdit) {
@@ -39,7 +39,7 @@ export default function EditAssetModalWrapper({ assetToEdit, onClose }: EditAsse
 
         setIsSubmitting(true);
         try {
-            await updateAsset(assetToEdit.id, formData);
+            await editAsset.mutateAsync({ id: assetToEdit.id, data: formData });
         } catch (error) {
             throw error;
         } finally {
@@ -76,7 +76,7 @@ export default function EditAssetModalWrapper({ assetToEdit, onClose }: EditAsse
                     </Label>
                     <Input
                         id="edit-codigo"
-                        name="codigo"
+                        name="code"
                         value={formData.code}
                         onChange={handleChange}
                         disabled={isSubmitting}

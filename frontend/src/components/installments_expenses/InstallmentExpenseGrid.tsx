@@ -2,7 +2,7 @@
 import type { InstallmentExpense } from "@base/types/expenses"
 import { CreditCard } from "lucide-react"
 import InstallmentExpenseCard from "@base/components/installments_expenses/InstallmentExpenseCard"
-import { useInstallmentsExpenseStore } from "@base/store/useInstallmentExpense"
+import { useInstallments } from "@base/hooks/useInstallments"
 import { useConfirmation } from "@base/contexts/ConfirmationDialogContext"
 
 type InstallmentExpenseGridProps = {
@@ -11,18 +11,18 @@ type InstallmentExpenseGridProps = {
 
 export default function InstallmentExpenseGrid({ installmentExpenses }: InstallmentExpenseGridProps) {
   const {confirm } = useConfirmation();
-  const { deleteInstallmentsExpenses } = useInstallmentsExpenseStore();
+  const { removeInstallment } = useInstallments();
 
   const handleDeleteInstallmentExpense = async (installmentExpenseToDeleted: InstallmentExpense) => {
     if(!installmentExpenseToDeleted) return;
     const isConfirmed = await confirm({
       title: '[ CONFIRMA EXCLUSÃO ]',
-      description: `voce realmente deseja excluir a despesa: ${installmentExpenseToDeleted.name}? `,
+      description: `Você realmente deseja excluir a despesa: ${installmentExpenseToDeleted.name}?`,
       confirmText: 'Sim, Excluir',
       cancelText: 'Não, Manter',
     })
     if(isConfirmed){
-      await deleteInstallmentsExpenses(installmentExpenseToDeleted)
+      await removeInstallment.mutateAsync(installmentExpenseToDeleted.id)
     }
   }
   return (

@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { type Asset } from '@base/types/assets'
 import GenericFormModal from '@base/components/ui/custom/GenericFormModal'
-import { useAssetsStore } from '@base/store/useAssetsStore'
+import { useAssets } from '@base/hooks/useAssets'
 import { Input } from '@base/components/ui/input'
 import { Label } from '@base/components/ui/label'
 
@@ -15,18 +15,18 @@ export default function AddAssetModalWrapper() {
         type: 'ACAO', 
     });
 
-    const { addAsset } = useAssetsStore();
+    const { addAsset } = useAssets();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        const finalValue = name === 'codigo' ? value.toUpperCase() : value;
+        const finalValue = name === 'code' ? value.toUpperCase() : value;
         setFormData(prev => ({ ...prev, [name]: finalValue }));
     }
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
-            await addAsset(formData);
+            await addAsset.mutateAsync(formData);
             setFormData({ code: '', type: 'ACAO' });
         } catch (error) {
             console.error("Falha na submissão do formulário de ativo.", error);

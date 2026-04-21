@@ -2,12 +2,12 @@
 import { useState, type ReactNode } from "react";
 import GenericFormModal from "@base/components/ui/custom/GenericFormModal";
 import AddExpenseForm from "@base/components/single_expenses/AddExpenseForm";
-import { ExpenseFormData } from "@base/types/expenses";
-import { useExpensesStore } from "@base/store/useSingleExpensesStore";
 import { Layers, Repeat, FilePlus } from "lucide-react";
-import { useCategoryStore } from "@base/store/useCategoryStore";
+import { useExpenses } from "@base/hooks/useExpenses";
+import { useCategories } from "@base/hooks/useCategories";
 import AddRecurringExpenseForm from "../recurring_expenses/AddRecurringExpenseForm";
 import AddInstallmentExpenseForm from "../installments_expenses/AddInstallmentExpenseForm";
+
 type ModalStep = 'selection' | 'single_expense' | 'recurring' | 'installment'
 
 type SelectionButtonProps = {
@@ -15,141 +15,125 @@ type SelectionButtonProps = {
     title: string;
     description: string;
     onClick: () => void;
-    disabled?: boolean;
 }
 
-function SelectionButton({
-    icon,
-    title,
-    description,
-    onClick,
-    disabled = false
-}: SelectionButtonProps){
-    return(
-        <button 
+function SelectionButton({ icon, title, description, onClick }: SelectionButtonProps) {
+    return (
+        <button
             type="button"
-            disabled={disabled}
             onClick={onClick}
-            className="w-full text-left p-4 rounded-lg border-2 transition-all duration-200"
+            className="w-full text-left p-4 rounded-lg border-2 border-slate-700 hover:border-purple-500/50 bg-slate-800/50 hover:bg-slate-800 transition-all duration-200"
         >
             <div className="flex items-center gap-4">
+                <div className="text-purple-400">{icon}</div>
                 <div>
-                    {icon}
-                </div>
-                <div>
-                    <h3></h3>
-                    <p>{description}</p>
+                    <h3 className="font-semibold text-slate-200">{title}</h3>
+                    <p className="text-sm text-slate-400">{description}</p>
                 </div>
             </div>
         </button>
     )
 }
 
-export default function AddExpenseModalWrapper({onSuccess} : {onSuccess: () => Promise<void>}){
+export default function AddExpenseModalWrapper() {
     const [step, setStep] = useState<ModalStep>('selection');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [modalOpen, setModalOpen] = useState(false)
-    const { addExpense } = useExpensesStore();
-    const { categories } = useCategoryStore();
-    const handleBack = () => setStep('selection');
 
-    const handleSingleExpenseSubmit = async (formData: ExpenseFormData) => {
+    const { addExpense } = useExpenses()
+    const { categories } = useCategories()
+
+    const handleBack = () => setStep('selection');
+    const handleClose = () => { setModalOpen(false); setStep('selection'); }
+
+    const handleSingleExpenseSubmit = async (formData: any) => {
         setIsSubmitting(true);
-        try{
-            await addExpense(formData);
-            setModalOpen(false);
-        } catch (error){
-            throw error;
-        } finally{
+        try {
+            await addExpense.mutateAsync(formData);
+            handleClose();
+        } catch {
+            // erro já tratado no hook
+        } finally {
             setIsSubmitting(false);
-        };
-        await onSuccess()
+        }
     };
 
     const renderStepContent = () => {
-        switch (step){
+        switch (step) {
             case 'single_expense':
-                return(
+                return (
                     <AddExpenseForm
                         onSave={handleSingleExpenseSubmit}
                         onCancel={handleBack}
                         availableCategories={categories}
                         submitButtonText="Registrar Despesa"
-                        onRequestClose={() => setModalOpen(false)}
+                        onRequestClose={handleClose}
                     />
                 );
             case 'recurring':
-                return(
-                    <AddRecurringExpenseForm onCancel={handleBack} onSuccess={onSuccess}/>
-                );
+                return <AddRecurringExpenseForm onCancel={handleBack} onSuccess={handleClose} />;
             case 'installment':
-                return(
-                    <AddInstallmentExpenseForm onCancel={handleBack} onSaveSuccess={onSuccess}/>
-                );
-            case 'selection':
-                default:
-                    return(
-                        <div className="space-y-4">
-                            <SelectionButton 
-                                icon={<FilePlus/>}
-                                title='Despesa Única'
-                                description="Para Gastos Pontuais, como um café ou uma conta"
-                                onClick={() => setStep('single_expense')}
-                            />
-                            <SelectionButton 
-                                icon={<Layers/>}
-                                title='Compra Parcelada'
-                                description="Registre uma Compra e o sistema criará as parcelas"
-                                onClick={() => setStep('installment')}
-                            />
-                            <SelectionButton 
-                                icon={<Repeat/>}
-                                title='Despesa Recorrente'
-                                description="Para assinaturas e contratos como: Nextlix, Aluguel"
-                                onClick={() => setStep('recurring')}
-                            />
-
-                        </div>
-                    )
-        };
+                return <AddInstallmentExpenseForm onCancel={handleBack} onSaveSuccess={handleClose} />;
+            default:
+                return (
+                    <div className="space-y-4">
+                        <SelectionButton
+                            icon={<FilePlus />}
+                            title='Despesa Única'
+                            description="Para gastos pontuais, como um café ou uma conta"
+                            onClick={() => setStep('single_expense')}
+                        />
+                        <SelectionButton
+                            icon={<Layers />}
+                            title='Compra Parcelada'
+                            description="Registre uma compra e o sistema criará as parcelas"
+                            onClick={() => setStep('installment')}
+                        />
+                        <SelectionButton
+                            icon={<Repeat />}
+                            title='Despesa Recorrente'
+                            description="Para assinaturas e contratos como Netflix, aluguel"
+                            onClick={() => setStep('recurring')}
+                        />
+                    </div>
+                )
+        }
     };
-    
+
     const getTitle = () => {
-        switch(step){
+        switch (step) {
             case 'single_expense': return '[ REGISTRAR DESPESA ]';
-            case 'recurring': return '[ REGISTRAR DESPESA RECORRENTE ]'
-            case 'installment': return '[ REGISTRAR DESPESA PARCELADA ]'
+            case 'recurring': return '[ REGISTRAR DESPESA RECORRENTE ]';
+            case 'installment': return '[ REGISTRAR DESPESA PARCELADA ]';
             default: return '[ SELECIONE O TIPO DE DESPESA ]'
         }
     }
 
     const getDescription = () => {
-        switch(step){
-            case 'single_expense': return '[ Preencha os Detalhes do seu Gasto ]';
-            case 'recurring': return '[ Preencha os Detalhes da sua Despesa Recorrente ]';
-            case 'installment': return '[ Preencha os Detalhes da sua Despesa Parcelada ]'
-            default: return "[ qual tipo de despesa você deseja registrar? ]"
+        switch (step) {
+            case 'single_expense': return '[ Preencha os detalhes do seu gasto ]';
+            case 'recurring': return '[ Preencha os detalhes da sua despesa recorrente ]';
+            case 'installment': return '[ Preencha os detalhes da sua despesa parcelada ]';
+            default: return "[ Qual tipo de despesa você deseja registrar? ]"
         }
     };
 
-    return(
+    return (
         <GenericFormModal
             title={getTitle()}
             open={modalOpen}
-            onOpenChange={setModalOpen}
+            onOpenChange={(open) => { setModalOpen(open); if (!open) setStep('selection'); }}
             description={getDescription()}
             useInternalForm={false}
             showFooter={false}
             isSubmitting={isSubmitting}
             triggerButton={
-                <button
-                    className="bg-gradient-to-r from-purple-700 to-purple-600 rounded-md text-white font-semibold hover:from-purple-600 hover:to-purple-500 shadow-sm  hover:shadow-purple-500/30 duration-200 active:scale-95 transition-all px-4 py-2 w-full sm:w-auto"
-                >
+                <button className="bg-gradient-to-r from-purple-700 to-purple-600 rounded-md text-white font-semibold hover:from-purple-600 hover:to-purple-500 shadow-sm hover:shadow-purple-500/30 duration-200 active:scale-95 transition-all px-4 py-2 w-full sm:w-auto">
                     NOVA DESPESA
                 </button>
             }
-        > 
-            {renderStepContent()}       
+        >
+            {renderStepContent()}
         </GenericFormModal>
     );
 }

@@ -1,10 +1,9 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import GenericFormModal from "@base/components/ui/custom/GenericFormModal"
-import { useCategoryStore } from "@base/store/useCategoryStore"
-import { Input } from "../ui/input"
-import { Label } from "@radix-ui/react-label"
+import { useCategories } from "@base/hooks/useCategories"
+import { Input } from "@base/components/ui/input"
+import { Label } from "@base/components/ui/label"
 import type { NewCategoryData, Category } from "@base/types/expenses"
 
 type EditCategoryModalWrapperProps = {
@@ -12,50 +11,41 @@ type EditCategoryModalWrapperProps = {
     onClose: () => void;
 }
 
-export default function EditCategoryModalWrapper({ categoryToEdit, onClose} : EditCategoryModalWrapperProps){
+export default function EditCategoryModalWrapper({ categoryToEdit, onClose }: EditCategoryModalWrapperProps) {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-    const [formData, setFormData] = useState<NewCategoryData>({
-        name: ''
-    })
-    const { updateCategory } = useCategoryStore();
+    const [formData, setFormData] = useState<NewCategoryData>({ name: '' })
+    const { editCategory } = useCategories();
 
     useEffect(() => {
-        if(categoryToEdit){
-            setFormData({
-                name: categoryToEdit.name
-            });
-        }
+        if (categoryToEdit) setFormData({ name: categoryToEdit.name });
     }, [categoryToEdit]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value} = e.target
-        setFormData(prev => ({ ...prev, [name]: value.toUpperCase()}));
+        setFormData({ name: e.target.value.toUpperCase() });
     }
+
     const handleSubmit = async () => {
-        if(!categoryToEdit) return;
+        if (!categoryToEdit) return;
         setIsSubmitting(true);
-        try{
-            await updateCategory(categoryToEdit.id, formData)
-        } catch (error){
-            throw error;
-        } finally{
+        try {
+            await editCategory.mutateAsync({ id: categoryToEdit.id, data: formData });
+            onClose();
+        } catch {
+            // erro já tratado no hook
+        } finally {
             setIsSubmitting(false);
         }
     }
+
     const isOpen = !!categoryToEdit;
-    if(!isOpen){
-        return null;
-    }
-    return(
+    if (!isOpen) return null;
+
+    return (
         <GenericFormModal
             open={isOpen}
-            onOpenChange={(openState) => {
-                if(!openState){
-                    onClose();
-                }
-            }}
+            onOpenChange={(openState) => { if (!openState) onClose(); }}
             title="[ EDITAR CATEGORIA ]"
-            description="[ Modifique sua Categoria ]"
+            description="[ Modifique sua categoria ]"
             isSubmitting={isSubmitting}
             onSubmit={handleSubmit}
             useInternalForm={true}
@@ -65,7 +55,7 @@ export default function EditCategoryModalWrapper({ categoryToEdit, onClose} : Ed
                 <Label htmlFor="name" className="text-sm font-semibold text-purple-300 tracking-wide">
                     NOME DA CATEGORIA
                 </Label>
-                <Input 
+                <Input
                     id="name"
                     name="name"
                     value={formData.name}

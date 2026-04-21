@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useAssetsStore } from "@base/store/useAssetsStore";
+import { useAssets } from "@base/hooks/useAssets";
+
+import { useState } from "react";
 import { useConfirmation } from "@base/contexts/ConfirmationDialogContext";
 import AddAssetModalWrapper from "@base/components/ativos/AddAssetModalWrapper";
 import EditAssetModalWrapper from "@base/components/ativos/EditAssetModalWrapper";
@@ -9,13 +10,10 @@ import type { Asset } from "@base/types/assets";
 import { Pencil, Trash2, Wallet } from 'lucide-react';
 
 export default function AtivosPage() {
-    const { assets, loading, error, fetchAssets, deleteAsset } = useAssetsStore();
+    const { assets, isLoading, isError, removeAsset } = useAssets();
     const { confirm } = useConfirmation();
     const [assetToEdit, setAssetToEdit] = useState<Asset | null>(null);
 
-    useEffect(() => {
-        fetchAssets();
-    }, [fetchAssets]);
 
     const handleDeleteClick = async (asset: Asset) => {
         const isConfirmed = await confirm({
@@ -25,15 +23,15 @@ export default function AtivosPage() {
         });
 
         if (isConfirmed) {
-            await deleteAsset(asset.id);
+            await removeAsset.mutateAsync(asset.id);
         }
     };
 
-    if (loading) {
+    if (isLoading) {
         return <div className="flex h-screen items-center justify-center text-lg text-purple-400 animate-pulse">「 Carregando carteira de ativos... 」</div>;
     }
-    if (error) {
-        return <div className="flex h-screen items-center justify-center text-red-400">[ ERRO DE CONEXÃO: {error} ]</div>;
+    if (isError) {
+        return <div className="flex h-screen items-center justify-center text-red-400">[ ERRO DE CONEXÃO ]</div>;
     }
 
     return (

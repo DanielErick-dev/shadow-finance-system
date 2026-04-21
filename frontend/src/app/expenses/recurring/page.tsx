@@ -1,73 +1,45 @@
 "use client"
-import { useState, useEffect } from "react";
-import { useRecurringExpenseStore } from "@base/store/useRecurringExpense";
+import { useState } from "react";
+import { useRecurring } from "@base/hooks/useRecurring";
 import { RecurringExpenseList } from "@base/components/recurring_expenses/RecurringExpenseList";
 import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import AddRecurringExpenseForm from "@base/components/recurring_expenses/AddRecurringExpenseForm";
-import { NewRecurringExpense, RecurringExpense } from "@base/types/expenses";
+import type { RecurringExpense } from "@base/types/expenses";
 import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
 import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
-export default function RecurringExpensesPage(){
+
+export default function RecurringExpensesPage() {
     const [isFormVisible, setIsFormVisible] = useState<boolean>(false);
     const [expenseToEdit, setExpenseToEdit] = useState<RecurringExpense | null>(null)
-    
-    const { 
-        loading, 
-        error, 
-        recurringExpenses: expenses, 
-        fetchRecurringExpenses, 
-        deleteRecurringExpense,
-    } = useRecurringExpenseStore();
 
-    const handleAddForm = () => {
-        setExpenseToEdit(null);
-        setIsFormVisible(true)
-    }
-    const handleEdit = (Expense: RecurringExpense) => {
-        setExpenseToEdit(Expense);
-        setIsFormVisible(true);
-    }
-    const onSuccess = () => {
-        setIsFormVisible(false);
-        fetchRecurringExpenses();
-    }
-    const onCancel = () => {
-        setIsFormVisible(false);
-    }
-    useEffect(() => {
-        fetchRecurringExpenses();
-    }, [fetchRecurringExpenses]);
+    const { recurringExpenses, isLoading, isError, removeRecurring } = useRecurring();
 
-    if (loading) {
-        <LoadingComponent text="CARREGANDO DESPESAS RECORRENTES"/>
-  }
+    const handleAddForm = () => { setExpenseToEdit(null); setIsFormVisible(true) }
 
-  if (error) {
-    <ErrorComponent error={error} errorMessage="NÃO FOI POSSÍVEL CARREGAR DESPESAS RECORRENTES"/>
-  }
-    return(
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800
-        to-slate-900 p-4 sm:p-6 lg:p-8">
+    const handleEdit = (expense: RecurringExpense) => { setExpenseToEdit(expense); setIsFormVisible(true); }
+
+    const onSuccess = () => setIsFormVisible(false)
+    const onCancel = () => setIsFormVisible(false)
+
+    if (isLoading) return <LoadingComponent text="CARREGANDO DESPESAS RECORRENTES" />
+    if (isError) return <ErrorComponent error="Erro" errorMessage="NÃO FOI POSSÍVEL CARREGAR DESPESAS RECORRENTES" />
+
+    return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-white mb-2">Despesas Recorrentes</h1>
-                        <p className="text-slate-400">
-                            Gerencie Suas Despesas que se repetem mensalmente
-                        </p>
+                        <p className="text-slate-400">Gerencie suas despesas que se repetem mensalmente</p>
                     </div>
                     <button
                         onClick={handleAddForm}
-                        className="flex items-center gap-2 bg-gradient-to-r from-purple-700
-                        to-purple-600 rounded-lg text-white font-semibold hover:from-purple-600 hover:to-purple-500 shadow-lg hover:shadow-purple-500/30 duration-200 active:scale-95 transition-all py-3 px-4"
+                        className="flex items-center gap-2 bg-gradient-to-r from-purple-700 to-purple-600 rounded-lg text-white font-semibold hover:from-purple-600 hover:to-purple-500 shadow-lg hover:shadow-purple-500/30 duration-200 active:scale-95 transition-all py-3 px-4"
                     >
                         <Plus className="w-5 h-5" />
                         Nova Despesa
-                        {isFormVisible 
-                            ? <ChevronUp className="w-4 h-4" />
-                            : <ChevronDown className="w-4 h-4" />
-                        }
+                        {isFormVisible ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
                 </div>
             </div>
@@ -75,13 +47,13 @@ export default function RecurringExpensesPage(){
                 <AnimatePresence>
                     {isFormVisible && (
                         <motion.div
-                            initial={{ opacity: 0, y: -20}}
-                            animate={{ opacity: 1, y: 0}}
-                            exit={{ opacity: 0, y: -20}}
-                            transition={{ duration: 0.3}}
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
                             className="mb-8"
                         >
-                            <AddRecurringExpenseForm 
+                            <AddRecurringExpenseForm
                                 onSuccess={onSuccess}
                                 onCancel={onCancel}
                                 initialData={expenseToEdit}
@@ -90,11 +62,11 @@ export default function RecurringExpensesPage(){
                     )}
                 </AnimatePresence>
             </div>
-           <RecurringExpenseList
-            expenses={expenses}
-            onDelete={deleteRecurringExpense}
-            onEdit={handleEdit}
-           />
+            <RecurringExpenseList
+                expenses={recurringExpenses}
+                onDelete={(expense) => removeRecurring.mutateAsync(expense.id)}
+                onEdit={handleEdit}
+            />
         </div>
     )
 }
