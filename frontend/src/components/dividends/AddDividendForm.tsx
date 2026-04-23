@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { type Asset } from '@base/types/assets'
 import { type ItemDividend } from '@base/types/dividends';
 import AddAssetModalWrapper from '@base/components/ativos/AddAssetModalWrapper';
@@ -15,7 +15,7 @@ export type DividendFormData = {
 type Props = {
     onSave: (formData: DividendFormData) => Promise<void>;
     onCancel: () => void;
-    initialData?: Omit<ItemDividend, 'id'>;
+    initialData?: ItemDividend;
     submitButtonText?: string;
     availableAssets: Asset[]
 }
@@ -27,27 +27,21 @@ export function AddDividendForm({
     submitButtonText = 'Adicionar',
     availableAssets
 }: Props) {
-    const getInitialFormState = (): DividendFormData => {
+    const [form, setForm] = useState<DividendFormData> (() => {
         if (initialData) {
             return {
                 assetCode: initialData.asset.code,
                 value: String(initialData.value),
-                received_date: initialData.received_date
-            };
+                received_date: initialData.received_date,
+            }
         }
         return {
-            assetCode: availableAssets.length > 0 ? availableAssets[0].code : '',
+            assetCode: availableAssets[0]?.code ?? '',
             value: '',
-            received_date: new Date().toISOString().split('T')[0]
+            received_date: new Date().toISOString().split('T')[0],
         }
-    }
-
-    const [form, setForm] = useState<DividendFormData>(getInitialFormState());
+    })
     const [isSubmitting, setIsSubmitting] = useState(false);
-      
-    useEffect(() => {
-        setForm(getInitialFormState());
-    }, [initialData, availableAssets]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -60,10 +54,6 @@ export function AddDividendForm({
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         
-        if (!form.assetCode) {
-            toast.error('Por favor, selecione um ativo válido.');
-            return;
-        }
         if (form.value === '' || Number(form.value) <= 0) {
             toast.error('Por favor, insira um valor positivo para o dividendo.');
             return;
@@ -71,15 +61,9 @@ export function AddDividendForm({
 
         setIsSubmitting(true);
         try {
-            const formDataToSave: DividendFormData = {
-                assetCode: form.assetCode,
-                value: form.value,
-                received_date: form.received_date,
-            };
-            await onSave(formDataToSave);
-            onCancel(); 
+            await onSave(form); 
         } catch (error) {
-            console.error("Falha ao salvar o formulário de dividendo.", error);
+            // erro de rede/API já tratado pelo hook via onError
         } finally {
             setIsSubmitting(false);
         }
@@ -88,7 +72,7 @@ export function AddDividendForm({
     return (
         <form onSubmit={handleSubmit} className='space-y-4 bg-slate-800/70 p-4 rounded-lg border border-slate-700'>
             <div className='flex justify-between items-center'>
-                <label htmlFor='ativoCodigo' className='block text-sm font-medium text-purple-300'>
+                <label htmlFor='assetCode' className='block text-sm font-medium text-purple-300'>
                     Ativo
                 </label>
                 <AddAssetModalWrapper />

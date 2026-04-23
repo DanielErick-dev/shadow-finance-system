@@ -174,8 +174,8 @@ export default function Investiments(){
                         <InvestimentCard
                             key={card.id}
                             data={card}
-                            onAddInvestiment={(cardId, item) => addInvestmentItem.mutateAsync({ cardId, item })}
-                            onUpdateInvestiment={(itemId, item) => editInvestmentItem.mutateAsync({ itemId, item })}
+                            onAddInvestiment={(data) => addInvestmentItem.mutateAsync(data)}
+                            onUpdateInvestiment={(itemId, data) => editInvestmentItem.mutateAsync({ itemId, data })}
                             onDeleteInvestiment={(itemId) => removeInvestmentItem.mutateAsync(itemId)}
                             onDeleteMonthCard={(cardId) => removeMonthCard.mutateAsync(cardId)}
                             availableAssets={assets}

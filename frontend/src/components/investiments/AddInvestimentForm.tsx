@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { type Asset } from "@base/types/assets"
 import { ItemInvestiment, OrderType } from "@base/types/investiments"
 import toast from "react-hot-toast"
@@ -21,7 +21,7 @@ type Props = {
     
     submitButtonText?: string;
     availableAssets: Asset[]
-    initialData?: Omit<ItemInvestiment, 'id'>; 
+    initialData?: ItemInvestiment; 
 }
 
 export function AddInvestimentForm({
@@ -31,31 +31,26 @@ export function AddInvestimentForm({
     availableAssets,
     initialData
 }: Props) {
-    const getInitialFormState = (): InvestimentFormData => {
+    const [form, setForm] = useState<InvestimentFormData>(() => {
         if(initialData){
             return {
                 assetCode: initialData.asset.code,
-                unit_price: String(initialData.unit_price),
                 order_type: initialData.order_type,
                 quantity: String(initialData.quantity),
+                unit_price: String(initialData.unit_price),
                 operation_date: initialData.operation_date
             }
         }
         return{
-            assetCode: availableAssets.length > 0 ? availableAssets[0].code : '',
-            unit_price: '',
+            assetCode: availableAssets[0]?.code ?? '',
             order_type: 'BUY',
             quantity: '',
+            unit_price: '',
             operation_date: new Date().toISOString().split('T')[0]
         }
-    };
+    })
 
-    const [form, setForm] = useState<InvestimentFormData>(getInitialFormState());
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    useEffect(() => {
-        setForm(getInitialFormState())
-    }, [initialData, availableAssets]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -68,10 +63,6 @@ export function AddInvestimentForm({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!form.assetCode) {
-            toast.error('Por favor, selecione um ativo válido.');
-            return;
-        }
         if (form.quantity === '' || Number(form.quantity) <= 0) {
             toast.error('A quantidade deve ser maior do que zero.');
             return;
@@ -84,9 +75,8 @@ export function AddInvestimentForm({
         setIsSubmitting(true);
         try {
             await onSave(form);
-            onCancel();
-        } catch (error) {
-            console.error('Não foi possível adicionar o investimento', error);
+        } catch {
+            // erro de rede/API já tratado pelo hook via onError
         } finally {
             setIsSubmitting(false);
         }

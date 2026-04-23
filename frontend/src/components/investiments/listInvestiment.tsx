@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { type Asset } from "@base/types/assets";
 import { AddInvestimentForm, InvestimentFormData }from "@base/components/investiments/AddInvestimentForm";
-import { ItemInvestiment, CardInvestimentMonth, } from "@base/types/investiments";
+import { ItemInvestiment, CardInvestimentMonth, NewItemInvestiment, EditItemInvestiment } from "@base/types/investiments";
 import { toast } from "react-hot-toast";
 import { Pencil, Trash } from "lucide-react";
 import { useConfirmation } from "@base/contexts/ConfirmationDialogContext";
@@ -15,8 +15,8 @@ import {
 
 type Props = {
     data: CardInvestimentMonth
-    onAddInvestiment: (cardId: number, item: Omit<ItemInvestiment, 'id'>) => Promise<void>;
-    onUpdateInvestiment: (itemId: number, itemData: Omit<ItemInvestiment, 'id'>) => Promise<void>;
+    onAddInvestiment: (data: NewItemInvestiment) => Promise<void>;
+    onUpdateInvestiment: (itemId: number, data: EditItemInvestiment) => Promise<void>;
     onDeleteInvestiment: (itemId: number) => Promise<void>;
     onDeleteMonthCard: (cardId: number) => Promise<void>;
     availableAssets: Asset[];
@@ -30,10 +30,9 @@ type InvestimentItemRowProps = {
 
 function InvestimentItemRow({ item, onEditClick, onDeleteClick} : InvestimentItemRowProps ){
     const totalValue = Number(item.quantity) * Number(item.unit_price)
-    const isBuyOrder = 'COMPRA';
+    const isBuyOrder = item.order_type === 'BUY';
     return (
         <li 
-            key={item.id}
             className="bg-slate-800/60 rounded-lg border border-slate-700 p-4 space-y-4">
             <div className="flex justify-between items-start">
                 <div >
@@ -100,6 +99,32 @@ function InvestimentItemRow({ item, onEditClick, onDeleteClick} : InvestimentIte
         </li>
     )
 }
+function buildNewItemPayload(formData: InvestimentFormData, cardId: number, assets:Asset[]): NewItemInvestiment | null {
+    const asset = assets.find(a => a.code === formData.assetCode);
+    if (!asset) return null;
+    return {
+        asset_id: asset.id,
+        order_type: formData.order_type,
+        quantity: formData.quantity,
+        unit_price: formData.unit_price,
+        operation_date: formData.operation_date,
+        card: cardId,
+    }
+
+}
+
+
+function buildEditItemPayload(formData: InvestimentFormData, assets: Asset[]): EditItemInvestiment | null {
+    const asset = assets.find(a => a.code === formData.assetCode)
+    if (!asset) return null
+    return {
+        asset_id: asset.id,
+        order_type: formData.order_type,
+        quantity: formData.quantity,
+        unit_price: formData.unit_price,
+        operation_date: formData.operation_date,
+    }
+}
 export function InvestimentCard(
     {
         data,
@@ -111,48 +136,35 @@ export function InvestimentCard(
     } : Props
 ) {
     const [isAdding, setIsAdding] = useState(false);
-    const [editingItemId, setIsEditingItemId] = useState<number | null>(null)
+    const [editingItemId, setEditingItemId] = useState<number | null>(null)
     const { confirm } = useConfirmation();
 
     const handleSaveNewInvestiment = async (formData: InvestimentFormData) => {
-        const selectedAsset = availableAssets.find(
-            asset => asset.code === formData.assetCode
-        )
-        if (!selectedAsset){
+        const payload = buildNewItemPayload(formData, data.id, availableAssets)
+        if(!payload){
             toast.error('Ativo selecionado é inválido, tente novamente')
-            throw new Error('ativo inválido')
+            return;
         }
-        const NewItemData: Omit<ItemInvestiment, 'id'> = {
-            asset: selectedAsset,
-            order_type: formData.order_type,
-            quantity: formData.quantity,
-            unit_price: formData.unit_price,
-            operation_date: formData.operation_date
-        }
-        await onAddInvestiment(data.id, NewItemData);
+        await onAddInvestiment(payload);
+        setIsAdding(false);
     }
+
+
     const handleSaveEditedInvestiment = async (formData: InvestimentFormData) => {
         if(!editingItemId) return;
-        const selectedAsset = availableAssets.find(
-            asset => asset.code === formData.assetCode
-        );
+        const payload = buildEditItemPayload(formData, availableAssets)
+        if(!payload){
+            toast.error('Ativo selecionado é inválido, tente novamente')
+            return;
+        }
 
-        if(!selectedAsset){
-            toast.error('Ativo selecionado é inválido, tente novamente');
-            throw new Error('ativo inválido');
-        }
-        const updatedItemData: Omit<ItemInvestiment, 'id'> = {
-            asset: selectedAsset,
-            order_type: formData.order_type,
-            quantity: formData.quantity,
-            unit_price: formData.unit_price,
-            operation_date: formData.operation_date
-        }
-        await onUpdateInvestiment(editingItemId, updatedItemData);
-        
+        await onUpdateInvestiment(editingItemId, payload);
+        setEditingItemId(null);
     }
+
+
     const handleCancelEdit = () => {
-        setIsEditingItemId(null);
+        setEditingItemId(null);
     }
 
     const handleDeleteClick = async (item: ItemInvestiment) => {
@@ -163,26 +175,19 @@ export function InvestimentCard(
             cancelText: 'Não, Manter'
         });
         if(isConfirmed){
-            try{
-                await onDeleteInvestiment(item.id);
-            } catch (error){
-                throw new Error('erro ao apagar registro de investimento')
-            }
+            await onDeleteInvestiment(item.id);
         }
     };
-    const handleDeleteMonthCard = async (card: CardInvestimentMonth) => {
+    const handleDeleteMonthCard = async () => {
         const isConfirmed = await confirm({
             title: '[ CONFIRMA EXCLUSÃO ]',
-            description: `você realmente deseja excluir o mês de: ${card.month}/${card.year}`,
+            description: `você realmente deseja excluir o mês de: ${data.month}/${data.year}`,
             confirmText: 'Sim, Excluir',
             cancelText: 'Não, Manter'
         });
+
         if(isConfirmed){
-            try{
-                await onDeleteMonthCard(card.id);
-            } catch (error){
-                throw new Error('erro ao apagar mês de investimentos')
-            }
+            await onDeleteMonthCard(data.id)
         }
     }
     const nameMonth = new Date(data.year, data.month - 1).toLocaleString('pt-BR', { month: 'long'})
@@ -220,7 +225,7 @@ export function InvestimentCard(
                         <Tooltip>
                             <TooltipTrigger asChild>   
                                 <button
-                                    onClick={() => handleDeleteMonthCard(data)}
+                                    onClick={() => handleDeleteMonthCard()}
                                     aria-label="Deletar Mês"
                                 >
                                     <Trash className="w-5 h-5 text-slate-400 group group-hover:text-red-500 cursor-pointer"/>
@@ -263,7 +268,7 @@ export function InvestimentCard(
                                 <InvestimentItemRow 
                                     key={item.id}
                                     item={item}
-                                    onEditClick={setIsEditingItemId}
+                                    onEditClick={setEditingItemId}
                                     onDeleteClick={handleDeleteClick}
                                 />
                             )

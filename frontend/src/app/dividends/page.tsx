@@ -188,8 +188,8 @@ export default function DividendPage(){
                         <DividendCard
                             key={card.id}
                             data={card}
-                            onAddDividend={(cardId, item) => addDividendItem.mutateAsync({ cardId, item })}
-                            onUpdateDividend={(itemId, item) => editDividendItem.mutateAsync({ itemId, item })}
+                            onAddDividend={(data) => addDividendItem.mutateAsync(data)}
+                            onUpdateDividend={(itemId, data) => editDividendItem.mutateAsync({ itemId, data })}
                             onDeleteDividend={(itemId) => removeDividendItem.mutateAsync(itemId)}
                             availableAssets={assets}
                             onDeleteCard={(cardId) => removeMonthCard.mutateAsync(cardId)}
