@@ -1,14 +1,17 @@
 "use client"
+
 import { useState } from "react"
-import { InvestimentCard } from "@base/components/investiments/listInvestiment"
+
 import { useInvestments } from "@base/hooks/useInvestiments"
 import { useAssets } from "@base/hooks/useAssets"
+
+import LoadingComponent from "@base/components/ui/custom/LoadingComponent"
+import ErrorComponent from "@base/components/ui/custom/ErrorComponent"
 import BackButton from "@base/components/ui/custom/backButton"
 import GenericFormModal from "@base/components/ui/custom/GenericFormModal"
-import { Label } from "@base/components/ui/label"
 import ReusablePagination from "@base/components/ui/custom/ReusablePagination"
-import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
-import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
+import { Label } from "@base/components/ui/label"
+import { InvestimentCard } from "@base/components/investiments/listInvestiment"
 
 export default function Investiments(){
     const [isSubmittingMonth, setIsSubmittingMonth] = useState(false);
@@ -66,16 +69,8 @@ export default function Investiments(){
         name: new Date(0, i).toLocaleString('pt-BR', { month: 'long' })
     }))
 
-    if (isLoading) {
-        return (
-            <LoadingComponent text="CARREGANDO INVESTIMENTOS"/>
-        )
-    }
-    if (isError) {
-        return (
-            <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSIVEL CARREGAR OS INVESTIMENTOS"/>
-        )
-    }
+    if (isLoading) return <LoadingComponent text="CARREGANDO INVESTIMENTOS" />
+    if (isError) return <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSÍVEL CARREGAR OS INVESTIMENTOS" />
 
     return(
         <div className="min-h-screen text-slate-200 py-6 sm:py-10">

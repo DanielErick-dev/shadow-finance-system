@@ -1,10 +1,15 @@
 "use client"
+
 import { useState } from "react";
-import { useCategories } from "@base/hooks/useCategories";
+
 import { Pencil, Trash2, Wallet } from "lucide-react";
-import AddCategoryModalWrapper from "@base/components/category_expenses/AddCategoryModalWrapper";
-import { Category } from "@base/types/expenses";
+
+import type { Category } from "@base/types/expenses";
+
+import { useCategories } from "@base/hooks/useCategories";
 import { useConfirmation } from "@base/contexts/ConfirmationDialogContext";
+
+import AddCategoryModalWrapper from "@base/components/category_expenses/AddCategoryModalWrapper";
 import EditCategoryModalWrapper from "@base/components/category_expenses/EditCategoryModalWrapper";
 import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
 import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
@@ -25,16 +30,8 @@ export default function CategoriesExpensesPage() {
         }
     };
 
-    if (isLoading) {
-        return (
-            <LoadingComponent text="CARREGANDO CATEGORIAS"/>
-        )
-    }
-    if (isError) {
-        return (
-            <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSIVEL CARREGAR AS CATEGORIAS"/>
-        )
-    }
+    if (isLoading) return <LoadingComponent text="CARREGANDO CATEGORIAS" />
+    if (isError) return <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSÍVEL CARREGAR AS CATEGORIAS" />
 
     return (
         <>

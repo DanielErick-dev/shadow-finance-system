@@ -1,11 +1,15 @@
 "use client"
+
 import { useState } from "react"
-import { type Asset } from "@base/types/assets"
-import { ItemInvestiment, OrderType } from "@base/types/investiments"
+
 import toast from "react-hot-toast"
+
+import type { Asset } from "@base/types/assets"
+import type { ItemInvestiment, OrderType } from "@base/types/investiments"
+
 import { Label } from "@base/components/ui/label"
-import AddAssetModalWrapper from "../ativos/AddAssetModalWrapper"
 import { Input } from "@base/components/ui/input"
+import AddAssetModalWrapper from "../ativos/AddAssetModalWrapper"
 
 export type InvestimentFormData = {
     assetCode: string;

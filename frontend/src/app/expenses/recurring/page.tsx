@@ -1,13 +1,18 @@
 "use client"
-import { useState } from "react";
-import { useRecurring } from "@base/hooks/useRecurring";
-import { RecurringExpenseList } from "@base/components/recurring_expenses/RecurringExpenseList";
-import { ChevronDown, ChevronUp, Plus } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
-import AddRecurringExpenseForm from "@base/components/recurring_expenses/AddRecurringExpenseForm";
-import type { RecurringExpense } from "@base/types/expenses";
-import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
-import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
+
+import { useState } from "react"
+
+import { ChevronDown, ChevronUp, Plus } from "lucide-react"
+import { AnimatePresence, motion } from "framer-motion"
+
+import type { RecurringExpense } from "@base/types/expenses"
+
+import { useRecurring } from "@base/hooks/useRecurring"
+
+import LoadingComponent from "@base/components/ui/custom/LoadingComponent"
+import ErrorComponent from "@base/components/ui/custom/ErrorComponent"
+import AddRecurringExpenseForm from "@base/components/recurring_expenses/AddRecurringExpenseForm"
+import { RecurringExpenseList } from "@base/components/recurring_expenses/RecurringExpenseList"
 
 export default function RecurringExpensesPage() {
     const [isFormVisible, setIsFormVisible] = useState<boolean>(false);

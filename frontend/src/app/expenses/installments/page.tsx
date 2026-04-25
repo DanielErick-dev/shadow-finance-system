@@ -1,26 +1,22 @@
 "use client"
+
 import { useState } from "react"
-import { useInstallments } from "@base/hooks/useInstallments"
-import InstallmentExpenseGrid from "@base/components/installments_expenses/InstallmentExpenseGrid"
+
 import { AnimatePresence, motion } from "framer-motion"
+
+import { useInstallments } from "@base/hooks/useInstallments"
+
+import LoadingComponent from "@base/components/ui/custom/LoadingComponent"
+import ErrorComponent from "@base/components/ui/custom/ErrorComponent"
+import InstallmentExpenseGrid from "@base/components/installments_expenses/InstallmentExpenseGrid"
 import AddInstallmentExpenseForm from "@base/components/installments_expenses/AddInstallmentExpenseForm"
-import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
-import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
 
 export default function InstallmentsPage() {
   const { installments, isLoading, isError } = useInstallments()
   const [isAdding, setIsAdding] = useState<boolean>(false)
 
-  if (isLoading) {
-      return (
-          <LoadingComponent text="CARREGANDO DIVIDENDOS"/>
-      )
-  }
-  if (isError) {
-      return (
-          <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSIVEL CARREGAR OS DIVIDENDOS"/>
-      )
-  }
+  if (isLoading) return <LoadingComponent text="CARREGANDO DESPESAS PARCELADAS" />
+  if (isError) return <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSÍVEL CARREGAR AS DESPESAS PARCELADAS" />
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-6">

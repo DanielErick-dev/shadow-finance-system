@@ -1,21 +1,24 @@
-"use client";
-import { useAssets } from "@base/hooks/useAssets";
+"use client"
 
-import { useState } from "react";
-import { useConfirmation } from "@base/contexts/ConfirmationDialogContext";
-import AddAssetModalWrapper from "@base/components/ativos/AddAssetModalWrapper";
-import EditAssetModalWrapper from "@base/components/ativos/EditAssetModalWrapper";
-import BackButton from "@base/components/ui/custom/backButton";
-import type { Asset } from "@base/types/assets";
-import { Pencil, Trash2, Wallet } from 'lucide-react';
-import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
-import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
+import { useState } from "react"
+
+import { Pencil, Trash2, Wallet } from "lucide-react"
+
+import type { Asset } from "@base/types/assets"
+
+import { useAssets } from "@base/hooks/useAssets"
+import { useConfirmation } from "@base/contexts/ConfirmationDialogContext"
+
+import LoadingComponent from "@base/components/ui/custom/LoadingComponent"
+import ErrorComponent from "@base/components/ui/custom/ErrorComponent"
+import BackButton from "@base/components/ui/custom/backButton"
+import AddAssetModalWrapper from "@base/components/ativos/AddAssetModalWrapper"
+import EditAssetModalWrapper from "@base/components/ativos/EditAssetModalWrapper"
 
 export default function AtivosPage() {
     const { assets, isLoading, isError, removeAsset } = useAssets();
     const { confirm } = useConfirmation();
     const [assetToEdit, setAssetToEdit] = useState<Asset | null>(null);
-
 
     const handleDeleteClick = async (asset: Asset) => {
         const isConfirmed = await confirm({
@@ -29,12 +32,8 @@ export default function AtivosPage() {
         }
     };
 
-    if (isLoading) {
-        return <LoadingComponent text="CARREGANDO CARTEIRA DE ATIVOS"/>;
-    }
-    if (isError) {
-        return <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSIVEL CARREGAR OS ATIVOS"/>;
-    }
+    if (isLoading) return <LoadingComponent text="CARREGANDO CARTEIRA DE ATIVOS" />
+    if (isError) return <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSÍVEL CARREGAR OS ATIVOS" />
 
     return (
         <>

@@ -1,14 +1,17 @@
-"use client";
-import { DividendCard } from "@base/components/dividends/ListDividend";
-import { useMemo, useState } from "react";
-import { useDividends } from "@base/hooks/useDividends";
-import { useAssets } from "@base/hooks/useAssets";
-import { Label } from "@base/components/ui/label";
-import GenericFormModal from "@base/components/ui/custom/GenericFormModal";
-import BackButton from "@base/components/ui/custom/backButton";
-import ReusablePagination from "@base/components/ui/custom/ReusablePagination";
-import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
-import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
+"use client"
+
+import { useMemo, useState } from "react"
+
+import { useDividends } from "@base/hooks/useDividends"
+import { useAssets } from "@base/hooks/useAssets"
+
+import LoadingComponent from "@base/components/ui/custom/LoadingComponent"
+import ErrorComponent from "@base/components/ui/custom/ErrorComponent"
+import BackButton from "@base/components/ui/custom/backButton"
+import GenericFormModal from "@base/components/ui/custom/GenericFormModal"
+import ReusablePagination from "@base/components/ui/custom/ReusablePagination"
+import { Label } from "@base/components/ui/label"
+import { DividendCard } from "@base/components/dividends/ListDividend"
 
 export default function DividendPage(){
     const [isSubmittingMonth, setIsSubmittingMonth] = useState(false);
@@ -76,16 +79,8 @@ export default function DividendPage(){
         });
     }, [cards]);
 
-    if (true) {
-        return (
-            <LoadingComponent text="CARREGANDO DIVIDENDOS"/>
-        )
-    }
-    if (isError) {
-        return (
-            <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSIVEL CARREGAR OS DIVIDENDOS"/>
-        )
-    }
+    if (isLoading) return <LoadingComponent text="CARREGANDO DIVIDENDOS" />
+    if (isError) return <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSÍVEL CARREGAR OS DIVIDENDOS" />
 
     return(
         <div className="min-h-screen text-slate-200 py-6 sm:py-10">

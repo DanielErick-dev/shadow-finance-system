@@ -1,14 +1,19 @@
 "use client"
-import type React from "react"
+
 import { useMemo, useState } from "react"
-import { useExpenses } from "@base/hooks/useExpenses"
-import ExpenseList from "@base/components/single_expenses/ListExpense"
+import type React from "react"
+
 import { ChevronDown, ChevronUp, Search, X, Calendar, Filter } from "lucide-react"
+
+import type { Expense, MonthlyExpense } from "@base/types/expenses"
+
+import { useExpenses } from "@base/hooks/useExpenses"
+
+import LoadingComponent from "@base/components/ui/custom/LoadingComponent"
+import ErrorComponent from "@base/components/ui/custom/ErrorComponent"
+import ExpenseList from "@base/components/single_expenses/ListExpense"
 import AddExpenseModalWrapper from "@base/components/single_expenses/AddExpenseModalWrapper"
 import EditExpenseModalWrapper from "@base/components/single_expenses/EditExpenseModalWrapper"
-import type { Expense, MonthlyExpense } from "@base/types/expenses"
-import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
-import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
 
 type StatusFilter = "all" | "pending" | "paid"
 type ExpenseTypeFilter = "all" | "recurring" | "simple" | "installment"
@@ -100,16 +105,8 @@ export default function ExpensesPage() {
     return filtered
   }, [expenses, searchTerm, statusFilter, expenseTypeFilter])
 
-  if (isLoading) {
-    return (
-        <LoadingComponent text="CARREGANDO DIVIDENDOS"/>
-    )
-  }
-  if (isError) {
-    return (
-        <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSIVEL CARREGAR OS DIVIDENDOS"/>
-    )
-  }
+  if (isLoading) return <LoadingComponent text="CARREGANDO DESPESAS" />
+  if (isError) return <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSÍVEL CARREGAR AS DESPESAS" />
   
 
   return (

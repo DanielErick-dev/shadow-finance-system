@@ -1,10 +1,13 @@
 'use client'
 
-import { useState } from 'react';
-import { type Asset } from '@base/types/assets'
-import { type ItemDividend } from '@base/types/dividends';
-import AddAssetModalWrapper from '@base/components/ativos/AddAssetModalWrapper';
-import toast from 'react-hot-toast';
+import { useState } from 'react'
+
+import toast from 'react-hot-toast'
+
+import type { Asset } from '@base/types/assets'
+import type { ItemDividend } from '@base/types/dividends'
+
+import AddAssetModalWrapper from '@base/components/ativos/AddAssetModalWrapper'
 
 export type DividendFormData = {
     assetCode: string;

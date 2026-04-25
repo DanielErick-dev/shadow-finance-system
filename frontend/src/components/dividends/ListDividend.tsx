@@ -1,12 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { type Asset } from '@base/types/assets'
-import { type ItemDividend, type DividendMonth, type NewItemDividend, type EditItemDividend } from '@base/types/dividends'
-import { AddDividendForm, type DividendFormData } from '@base/components/dividends/AddDividendForm'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@base/components/ui/tooltip'
-import { useConfirmation } from '@base/contexts/ConfirmationDialogContext'
+
 import toast from 'react-hot-toast'
+
+import type { Asset } from '@base/types/assets'
+import type { ItemDividend, DividendMonth, NewItemDividend, EditItemDividend } from '@base/types/dividends'
+
+import { useConfirmation } from '@base/contexts/ConfirmationDialogContext'
+
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@base/components/ui/tooltip'
+import { AddDividendForm, type DividendFormData } from '@base/components/dividends/AddDividendForm'
 
 // --- Types ---
 
