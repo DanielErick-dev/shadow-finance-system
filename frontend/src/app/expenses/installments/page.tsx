@@ -4,20 +4,22 @@ import { useInstallments } from "@base/hooks/useInstallments"
 import InstallmentExpenseGrid from "@base/components/installments_expenses/InstallmentExpenseGrid"
 import { AnimatePresence, motion } from "framer-motion"
 import AddInstallmentExpenseForm from "@base/components/installments_expenses/AddInstallmentExpenseForm"
+import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
+import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
 
 export default function InstallmentsPage() {
   const { installments, isLoading, isError } = useInstallments()
   const [isAdding, setIsAdding] = useState<boolean>(false)
 
   if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center text-lg text-purple-400 animate-pulse">
-        [ Carregando Contratos Parcelados... ]
-      </div>
-    )
+      return (
+          <LoadingComponent text="CARREGANDO DIVIDENDOS"/>
+      )
   }
   if (isError) {
-    return <div className="text-center p-10 text-red-400">[ ERRO ao carregar despesas parceladas ]</div>
+      return (
+          <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSIVEL CARREGAR OS DIVIDENDOS"/>
+      )
   }
 
   return (

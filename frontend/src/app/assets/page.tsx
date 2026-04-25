@@ -8,6 +8,8 @@ import EditAssetModalWrapper from "@base/components/ativos/EditAssetModalWrapper
 import BackButton from "@base/components/ui/custom/backButton";
 import type { Asset } from "@base/types/assets";
 import { Pencil, Trash2, Wallet } from 'lucide-react';
+import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
+import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
 
 export default function AtivosPage() {
     const { assets, isLoading, isError, removeAsset } = useAssets();
@@ -28,10 +30,10 @@ export default function AtivosPage() {
     };
 
     if (isLoading) {
-        return <div className="flex h-screen items-center justify-center text-lg text-purple-400 animate-pulse">「 Carregando carteira de ativos... 」</div>;
+        return <LoadingComponent text="CARREGANDO CARTEIRA DE ATIVOS"/>;
     }
     if (isError) {
-        return <div className="flex h-screen items-center justify-center text-red-400">[ ERRO DE CONEXÃO ]</div>;
+        return <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSIVEL CARREGAR OS ATIVOS"/>;
     }
 
     return (

@@ -7,6 +7,8 @@ import { ChevronDown, ChevronUp, Search, X, Calendar, Filter } from "lucide-reac
 import AddExpenseModalWrapper from "@base/components/single_expenses/AddExpenseModalWrapper"
 import EditExpenseModalWrapper from "@base/components/single_expenses/EditExpenseModalWrapper"
 import type { Expense, MonthlyExpense } from "@base/types/expenses"
+import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
+import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
 
 type StatusFilter = "all" | "pending" | "paid"
 type ExpenseTypeFilter = "all" | "recurring" | "simple" | "installment"
@@ -100,33 +102,15 @@ export default function ExpensesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
-        <div className="relative">
-          <div className="w-16 h-16 border-4 border-slate-700 border-t-purple-500 rounded-full animate-spin"></div>
-          <div className="mt-6 text-center">
-            <div className="text-lg font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-pulse">
-              CARREGANDO DESPESAS
-            </div>
-          </div>
-        </div>
-      </div>
+        <LoadingComponent text="CARREGANDO DIVIDENDOS"/>
     )
   }
-
   if (isError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
-        <div className="text-center p-8 bg-gradient-to-br from-red-900/20 to-red-800/10 border border-red-500/30 rounded-2xl backdrop-blur-sm max-w-md">
-          <div className="text-2xl font-bold text-red-400 mb-3">ERRO</div>
-          <button onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-medium rounded-lg transition-all duration-200 active:scale-95"
-          >
-            Tentar Novamente
-          </button>
-        </div>
-      </div>
+        <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSIVEL CARREGAR OS DIVIDENDOS"/>
     )
   }
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4">

@@ -6,6 +6,8 @@ import AddCategoryModalWrapper from "@base/components/category_expenses/AddCateg
 import { Category } from "@base/types/expenses";
 import { useConfirmation } from "@base/contexts/ConfirmationDialogContext";
 import EditCategoryModalWrapper from "@base/components/category_expenses/EditCategoryModalWrapper";
+import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
+import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
 
 export default function CategoriesExpensesPage() {
     const { categories, isLoading, isError, removeCategory } = useCategories();
@@ -25,16 +27,12 @@ export default function CategoriesExpensesPage() {
 
     if (isLoading) {
         return (
-            <div className="flex h-screen items-center justify-center text-lg text-purple-400 animate-pulse">
-                [ PROCESSANDO CATEGORIAS... ]
-            </div>
+            <LoadingComponent text="CARREGANDO CATEGORIAS"/>
         )
     }
     if (isError) {
         return (
-            <div className="flex h-screen items-center justify-center text-lg text-red-400">
-                [ ERRO DE CONEXÃO ]
-            </div>
+            <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSIVEL CARREGAR AS CATEGORIAS"/>
         )
     }
 

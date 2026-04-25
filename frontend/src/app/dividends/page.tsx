@@ -7,6 +7,8 @@ import { Label } from "@base/components/ui/label";
 import GenericFormModal from "@base/components/ui/custom/GenericFormModal";
 import BackButton from "@base/components/ui/custom/backButton";
 import ReusablePagination from "@base/components/ui/custom/ReusablePagination";
+import LoadingComponent from "@base/components/ui/custom/LoadingComponent";
+import ErrorComponent from "@base/components/ui/custom/ErrorComponent";
 
 export default function DividendPage(){
     const [isSubmittingMonth, setIsSubmittingMonth] = useState(false);
@@ -74,22 +76,14 @@ export default function DividendPage(){
         });
     }, [cards]);
 
-    if (isLoading) {
+    if (true) {
         return (
-            <div className="flex h-screen items-center justify-center bg-slate-950">
-                <p className="text-lg text-purple-400 animate-pulse">
-                    「 Carregando dados do sistema... 」
-                </p>
-            </div>
+            <LoadingComponent text="CARREGANDO DIVIDENDOS"/>
         )
     }
     if (isError) {
         return (
-            <div className="flex h-screen items-center justify-center bg-slate-950">
-                <div className="rounded-lg border border-red-500/50 bg-red-900/20 p-6 text-center">
-                    <h3 className="text-lg font-bold text-red-400">[ ERRO DE CONEXÃO ]</h3>
-                </div>
-            </div>
+            <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSIVEL CARREGAR OS DIVIDENDOS"/>
         )
     }
 
