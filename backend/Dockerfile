@@ -10,4 +10,7 @@ COPY --from=builder /wheels /wheels
 COPY --from=builder /app/requirements.txt .
 RUN pip install --no-cache /wheels/*
 COPY . .
-
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+RUN chown -R appuser:appgroup /app
+USER appuser
+CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]
