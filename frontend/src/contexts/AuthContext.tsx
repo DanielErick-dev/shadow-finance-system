@@ -16,7 +16,7 @@ type AuthContextType = {
     isAuthenticated: boolean;
     loading: boolean;
     login: (username: string, password: string) => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
     user: User | null;
 }
 
@@ -29,17 +29,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const pathname = usePathname();
 
     const verifyUser = async () => {
-        const accessToken = localStorage.getItem('access_token');
-        if (!accessToken) {
-            setLoading(false);
-            return;
-        }
-
         try {
-            const response = await api.get('/me/');
+            const response = await api.get('me/');
             setUser(response.data);
-        } catch (error) {
-            console.error("Falha na verificação de autenticação:", error);
+        } catch {
             setUser(null);
         } finally {
             setLoading(false);
@@ -50,40 +43,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         verifyUser();
     }, []);
 
+
     const login = async (username: string, password: string) => {
         const loadingToastId = toast.loading('Autenticando...');
         try {
-            const response = await api.post('/token/', { username, password });
-            localStorage.setItem('access_token', response.data.access);
-            localStorage.setItem('refresh_token', response.data.refresh);
+            await api.post('login/', { username, password });
             await verifyUser();
             toast.success('Login bem-sucedido!', { id: loadingToastId });
             audioService.play('ergase', 0.8)
             router.push('/painel');
-        } catch (error) {
-            console.error("Erro no login:", error);
+        } catch {
             toast.error('Credenciais inválidas. Tente novamente.', { id: loadingToastId });
             throw new Error('Falha no login');
         }
     }
 
-    const logout = () => {
-        toast.success('Deslogado com sucesso.');
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        setUser(null);
-        if (pathname !== '/auth/login') {
-            router.push('/auth/login');
+    const logout = async () => {
+        try{
+            await api.post('logout/')
+        } catch {
+
+        } finally {
+            setUser(null);
+            toast.success('Deslogado com Sucesso')
+            if (pathname !== '/auth/login') {
+                router.push('/auth/login');
+            }
         }
     }
     
-    const value = {
-        user,
-        isAuthenticated: !!user,
-        loading,
-        login,
-        logout,
-    };
+    const value = { user, isAuthenticated: !!user, loading, login, logout };
 
     return (
         <AuthContext.Provider value={value}>
