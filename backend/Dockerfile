@@ -1,16 +1,18 @@
 FROM python:3.11-slim-bookworm AS builder
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
 WORKDIR /app
-RUN pip install --upgrade pip
-COPY requirements.txt .
-RUN pip wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev --no-install-project
 
 FROM python:3.11-slim-bookworm
 WORKDIR /app
-COPY --from=builder /wheels /wheels
-COPY --from=builder /app/requirements.txt .
-RUN pip install --no-cache /wheels/*
+COPY --from=builder /app/.venv ./.venv
 COPY . .
+
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 RUN chown -R appuser:appgroup /app
 USER appuser
+
+ENV PATH="/app/.venv/bin:$PATH"
 CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]

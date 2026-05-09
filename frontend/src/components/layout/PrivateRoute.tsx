@@ -19,15 +19,23 @@ export default function PrivateRoute({ children }: PrivateRouteProps) {
     const isPublicRoute = publicRoutes.includes(pathname);
 
     useEffect(() => {
-        if(loading || isPublicRoute) return;
-        if(!user) router.push('/auth/login');
-        
-    }, [user, loading, router, pathname, isPublicRoute])
+        if (loading) return; 
 
-    if (loading){
-        return <LoadingComponent text="VERIFICANDO AUTENTICAÇÃO"/>
+        if (user && isPublicRoute) {
+            router.push('/painel');
+        }
+        if (!user && !isPublicRoute) {
+            router.push('/auth/login');
+        }
+    }, [user, loading, isPublicRoute, router]);
+
+    if (loading) {
+        return <LoadingComponent text="VERIFICANDO AUTENTICAÇÃO" />;
     }
 
-    if (isPublicRoute || user)return children;
-    return null;
+    if ((user && isPublicRoute) || (!user && !isPublicRoute)) {
+        return null;
+    }
+
+    return children;
 }
