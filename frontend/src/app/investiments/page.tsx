@@ -5,7 +5,7 @@ import { useState } from "react"
 import { useInvestments } from "@base/hooks/useInvestiments"
 import { useAssets } from "@base/hooks/useAssets"
 
-import LoadingComponent from "@base/components/ui/custom/LoadingComponent"
+import { Skeleton } from "@base/components/ui/custom/Skeleton"
 import ErrorComponent from "@base/components/ui/custom/ErrorComponent"
 import BackButton from "@base/components/ui/custom/backButton"
 import GenericFormModal from "@base/components/ui/custom/GenericFormModal"
@@ -69,7 +69,37 @@ export default function Investiments(){
         name: new Date(0, i).toLocaleString('pt-BR', { month: 'long' })
     }))
 
-    if (isLoading) return <LoadingComponent text="CARREGANDO INVESTIMENTOS" />
+    if (isLoading) return (
+        <div className="min-h-screen text-slate-200 py-6 sm:py-10">
+            <div className="container mx-auto px-4 md:px-6 max-w-4xl">
+                <header className="flex justify-between items-center mb-10 pb-5 border-b border-purple-800/50">
+                    <Skeleton className="h-10 w-72" />
+                    <Skeleton className="h-9 w-32 rounded-lg" />
+                </header>
+                <div className="space-y-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+                            <div className="p-4 border-b border-slate-700 flex justify-between">
+                                <Skeleton className="h-6 w-32" />
+                                <Skeleton className="h-6 w-20" />
+                            </div>
+                            <div className="p-4 space-y-3">
+                                {Array.from({ length: 3 }).map((_, j) => (
+                                    <div key={j} className="flex justify-between items-center">
+                                        <Skeleton className="h-4 w-24" />
+                                        <Skeleton className="h-4 w-16" />
+                                        <Skeleton className="h-4 w-20" />
+                                        <Skeleton className="h-4 w-20" />
+                                        <Skeleton className="h-7 w-16 rounded-full" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    )
     if (isError) return <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSÍVEL CARREGAR OS INVESTIMENTOS" />
 
     return(

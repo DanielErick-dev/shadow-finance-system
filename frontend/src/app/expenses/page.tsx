@@ -9,7 +9,7 @@ import type { Expense, MonthlyExpense } from "@base/types/expenses"
 
 import { useExpenses } from "@base/hooks/useExpenses"
 
-import LoadingComponent from "@base/components/ui/custom/LoadingComponent"
+import { Skeleton } from "@base/components/ui/custom/Skeleton"
 import ErrorComponent from "@base/components/ui/custom/ErrorComponent"
 import ExpenseList from "@base/components/single_expenses/ListExpense"
 import AddExpenseModalWrapper from "@base/components/single_expenses/AddExpenseModalWrapper"
@@ -105,7 +105,30 @@ export default function ExpensesPage() {
     return filtered
   }, [expenses, searchTerm, statusFilter, expenseTypeFilter])
 
-  if (isLoading) return <LoadingComponent text="CARREGANDO DESPESAS" />
+  if (isLoading) return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="bg-slate-900/95 border border-slate-700/50 rounded-2xl p-6 space-y-4">
+          <Skeleton className="h-10 w-full rounded-xl" />
+          <div className="flex gap-3">
+            <Skeleton className="h-10 w-32 rounded-xl" />
+            <Skeleton className="h-10 w-32 rounded-xl" />
+          </div>
+        </div>
+        <div className="space-y-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="bg-slate-900/95 border border-slate-700/50 rounded-xl p-4 flex justify-between items-center">
+              <div className="space-y-2 flex-1">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+              <Skeleton className="h-6 w-20" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
   if (isError) return <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSÍVEL CARREGAR AS DESPESAS" />
   
 

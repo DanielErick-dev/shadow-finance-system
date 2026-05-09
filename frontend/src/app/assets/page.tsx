@@ -9,7 +9,7 @@ import type { Asset } from "@base/types/assets"
 import { useAssets } from "@base/hooks/useAssets"
 import { useConfirmation } from "@base/contexts/ConfirmationDialogContext"
 
-import LoadingComponent from "@base/components/ui/custom/LoadingComponent"
+import { Skeleton } from "@base/components/ui/custom/Skeleton"
 import ErrorComponent from "@base/components/ui/custom/ErrorComponent"
 import BackButton from "@base/components/ui/custom/backButton"
 import AddAssetModalWrapper from "@base/components/ativos/AddAssetModalWrapper"
@@ -32,7 +32,40 @@ export default function AtivosPage() {
         }
     };
 
-    if (isLoading) return <LoadingComponent text="CARREGANDO CARTEIRA DE ATIVOS" />
+    if (isLoading) return (
+        <div className="min-h-screen text-slate-200 py-6 sm:py-10">
+            <div className="container mx-auto px-4 md:px-6 max-w-4xl">
+                <div className="mb-10"><Skeleton className="h-8 w-32" /></div>
+                <header className="flex justify-between items-center mb-10 pb-5 border-b border-purple-800/50">
+                    <Skeleton className="h-10 w-64" />
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                </header>
+                <div className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+                    <table className="w-full">
+                        <thead className="border-b border-slate-700 bg-slate-800/50">
+                            <tr>
+                                <th className="p-4"><Skeleton className="h-4 w-32" /></th>
+                                <th className="p-4"><Skeleton className="h-4 w-16" /></th>
+                                <th className="p-4"><Skeleton className="h-4 w-16 ml-auto" /></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Array.from({ length: 5 }).map((_, i) => (
+                                <tr key={i} className="border-b border-slate-800">
+                                    <td className="p-4"><Skeleton className="h-4 w-24" /></td>
+                                    <td className="p-4"><Skeleton className="h-4 w-20" /></td>
+                                    <td className="p-4 flex justify-end gap-3">
+                                        <Skeleton className="h-8 w-8 rounded-full" />
+                                        <Skeleton className="h-8 w-8 rounded-full" />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    )
     if (isError) return <ErrorComponent error="Erro de conexão" errorMessage="NÃO FOI POSSÍVEL CARREGAR OS ATIVOS" />
 
     return (
