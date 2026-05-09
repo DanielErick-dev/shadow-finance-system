@@ -6,6 +6,9 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY não pode ser vazia. Defina a variável de ambiente SECRET_KEY.")
+
 DEBUG = config("DEBUG", default=False, cast=bool)
 DJANGO_ENV = config('DJANGO_ENV', default='development')
 
@@ -103,6 +106,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -129,6 +133,10 @@ AUTH_USER_MODEL = 'costumers.CustomUser'
 
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
-
+else:
+    CORS_ALLOWED_ORIGINS = [
+        "https://monarcafinanceiro.com.br",
+        "https://www.monarcafinanceiro.com.br",
+    ]
 
 CORS_ALLOW_CREDENTIALS = True
