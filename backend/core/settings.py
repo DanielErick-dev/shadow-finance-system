@@ -9,9 +9,10 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
 DJANGO_ENV = config('DJANGO_ENV', default='development')
 
-ALLOWED_HOSTS = []
 if DEBUG:
-    ALLOWED_HOSTS = ['*']
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost").split(",")
 
 INSTALLED_APPS = [
     "corsheaders",
