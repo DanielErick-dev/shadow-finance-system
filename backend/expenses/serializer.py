@@ -1,12 +1,21 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from .models import Expense, Category, InstallmentExpense, PaidRecurringExpense, RecurringExpense
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'user']
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Category.objects.all(),
+                fields=['user', 'name'],
+                message='Você já possui uma categoria com este nome.',
+            )
+        ]
 
 
 class InstallmentExpenseSerializer(serializers.ModelSerializer):
