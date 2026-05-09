@@ -13,7 +13,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-  
+
   api:
     build:
       context: ./backend
@@ -21,17 +21,18 @@ services:
     command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DJANGO_ENV: PRODUCTION
     depends_on:
       db:
         condition: service_healthy
     restart: always
-  
+
   frontend:
     build:
       context: ./frontend
     image: danielerickdev/finance-system-frontend:latest
     restart: always
-  
+
   nginx:
     image: nginx:1.25-alpine
     ports:
@@ -47,4 +48,3 @@ services:
 
 volumes:
   postgres_data:
-
