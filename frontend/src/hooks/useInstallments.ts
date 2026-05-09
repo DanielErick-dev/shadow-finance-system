@@ -6,6 +6,7 @@ import {
 } from '@base/services/installmentsService'
 import type { NewInstallmentExpenseData } from '@base/types/expenses'
 import toast from 'react-hot-toast'
+import { extractApiError } from '@base/lib/api'
 
 export const INSTALLMENTS_QUERY_KEY = 'installments' as const
 
@@ -23,13 +24,13 @@ export function useInstallments() {
     const addInstallment = useMutation({
         mutationFn: (data: NewInstallmentExpenseData) => createInstallment(data),
         onSuccess: () => { invalidate(); toast.success('Despesa parcelada criada com sucesso!') },
-        onError: () => toast.error('Não foi possível adicionar a despesa parcelada.'),
+        onError: (err) => toast.error(extractApiError(err, 'Não foi possível adicionar a despesa parcelada.')),
     })
 
     const removeInstallment = useMutation({
         mutationFn: (id: number) => deleteInstallment(id),
         onSuccess: () => { invalidate(); toast.success('Despesa parcelada excluída com sucesso!') },
-        onError: () => toast.error('Não foi possível excluir a despesa parcelada.'),
+        onError: (err) => toast.error(extractApiError(err, 'Não foi possível excluir a despesa parcelada.')),
     })
 
     return {

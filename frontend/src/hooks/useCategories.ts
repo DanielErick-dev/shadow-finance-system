@@ -7,6 +7,7 @@ import {
 } from '@base/services/categoriesService'
 import type { NewCategoryData } from '@base/types/expenses'
 import toast from 'react-hot-toast'
+import { extractApiError } from '@base/lib/api'
 
 export const CATEGORIES_QUERY_KEY = 'categories' as const
 
@@ -24,22 +25,19 @@ export function useCategories() {
     const addCategory = useMutation({
         mutationFn: (data: NewCategoryData) => createCategory(data),
         onSuccess: () => { invalidate(); toast.success('Categoria criada com sucesso!') },
-        onError: (err: any) => {
-            const msg = err.response?.data?.name?.[0] || 'Falha ao criar categoria.'
-            toast.error(msg)
-        },
+        onError: (err) => toast.error(extractApiError(err, 'Falha ao criar categoria.')),
     })
 
     const editCategory = useMutation({
         mutationFn: ({ id, data }: { id: number; data: NewCategoryData }) => updateCategory(id, data),
         onSuccess: () => { invalidate(); toast.success('Categoria atualizada com sucesso!') },
-        onError: () => toast.error('Não foi possível atualizar a categoria.'),
+        onError: (err) => toast.error(extractApiError(err, 'Não foi possível atualizar a categoria.')),
     })
 
     const removeCategory = useMutation({
         mutationFn: (id: number) => deleteCategory(id),
         onSuccess: () => { invalidate(); toast.success('Categoria excluída com sucesso!') },
-        onError: () => toast.error('Não foi possível excluir a categoria.'),
+        onError: (err) => toast.error(extractApiError(err, 'Não foi possível excluir a categoria.')),
     })
 
     return {

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAssets, createAsset, updateAsset, deleteAsset } from "@base/services/assetsService";
 import type { NewAsset } from "@base/types/assets";
 import toast from "react-hot-toast";
+import { extractApiError } from '@base/lib/api'
 
 export const ASSETS_QUERY_KEY = ['assets'] as const
 
@@ -19,21 +20,16 @@ export function useAssets() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ASSETS_QUERY_KEY})
         },
-        onError: (err: any) => {
-            const msg = err.response?.data?.codigo?.[0] || 'Falha ao Registrar ativo'
-            toast.error(msg)
-        },
+        onError: (err) => toast.error(extractApiError(err, 'Falha ao registrar ativo.')),
     })
 
     const editAsset = useMutation({
-        mutationFn: ({ id, data }: { id: number; data: NewAsset }) => 
+        mutationFn: ({ id, data }: { id: number; data: NewAsset }) =>
             updateAsset(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ASSETS_QUERY_KEY })
         },
-        onError: () => {
-            toast.error('Não foi possivel salvar as alterações.')
-        }
+        onError: (err) => toast.error(extractApiError(err, 'Não foi possível salvar as alterações.')),
     })
 
     const removeAsset = useMutation({
@@ -41,9 +37,7 @@ export function useAssets() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ASSETS_QUERY_KEY })
         },
-        onError: () => {
-            toast.error('Não foi possivel remover o ativo.')
-        }
+        onError: (err) => toast.error(extractApiError(err, 'Não foi possível remover o ativo.')),
     })
 
     return {

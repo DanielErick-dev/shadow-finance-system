@@ -24,9 +24,10 @@ export default function RootLayout({
         <Providers>
           <AuthProvider>
             <ConfirmationDialogProvider>
-              <Toaster 
-                position="top-right" 
+              <Toaster
+                position="top-right"
                 reverseOrder={false}
+                containerStyle={{ zIndex: 9999 }}
                 toastOptions={{
                   className: 'bg-theme-dark-secondary border border-theme-primary/50 text-slate-200 shadow-theme-glow',
                   success: {

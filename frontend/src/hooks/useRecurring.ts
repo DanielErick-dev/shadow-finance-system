@@ -7,6 +7,7 @@ import {
 } from '@base/services/recurringService'
 import type { NewRecurringExpense } from '@base/types/expenses'
 import toast from 'react-hot-toast'
+import { extractApiError } from '@base/lib/api'
 
 export const RECURRING_QUERY_KEY = 'recurring' as const
 
@@ -24,20 +25,20 @@ export function useRecurring() {
     const addRecurring = useMutation({
         mutationFn: (data: NewRecurringExpense) => createRecurringExpense(data),
         onSuccess: () => { invalidate(); toast.success('Despesa recorrente criada com sucesso!') },
-        onError: () => toast.error('Não foi possível salvar a despesa recorrente.'),
+        onError: (err) => toast.error(extractApiError(err, 'Não foi possível salvar a despesa recorrente.')),
     })
 
     const editRecurring = useMutation({
         mutationFn: ({ id, data }: { id: number; data: NewRecurringExpense }) =>
             updateRecurringExpense(id, data),
         onSuccess: () => { invalidate(); toast.success('Despesa recorrente atualizada com sucesso!') },
-        onError: () => toast.error('Não foi possível editar a despesa recorrente.'),
+        onError: (err) => toast.error(extractApiError(err, 'Não foi possível editar a despesa recorrente.')),
     })
 
     const removeRecurring = useMutation({
         mutationFn: (id: number) => deleteRecurringExpense(id),
         onSuccess: () => { invalidate(); toast.success('Despesa recorrente excluída com sucesso!') },
-        onError: () => toast.error('Não foi possível excluir a despesa recorrente.'),
+        onError: (err) => toast.error(extractApiError(err, 'Não foi possível excluir a despesa recorrente.')),
     })
 
     return {

@@ -10,6 +10,7 @@ import {
 } from '@base/services/investmentsService'
 import type { NewItemInvestiment, EditItemInvestiment, NewCardInvestiment } from '@base/types/investiments'
 import toast from 'react-hot-toast'
+import { extractApiError } from '@base/lib/api'
 
 export const INVESTMENTS_QUERY_KEY = 'investments' as const
 
@@ -29,35 +30,32 @@ export function useInvestments(filters: InvestmentFilters = {}, page: number = 1
     const addInvestmentItem = useMutation({
         mutationFn: (data: NewItemInvestiment) => createInvestmentItem(data),
         onSuccess: () => { invalidate(); toast.success('Investimento adicionado com sucesso!') },
-        onError: () => toast.error('Falha ao adicionar investimento.'),
+        onError: (err) => toast.error(extractApiError(err, 'Falha ao adicionar investimento.')),
     })
 
     const editInvestmentItem = useMutation({
         mutationFn: ({ itemId, data }: { itemId: number; data: EditItemInvestiment }) =>
             updateInvestmentItem(itemId, data),
         onSuccess: () => { invalidate(); toast.success('Investimento atualizado com sucesso!') },
-        onError: () => toast.error('Falha ao atualizar registro.'),
+        onError: (err) => toast.error(extractApiError(err, 'Falha ao atualizar registro.')),
     })
 
     const removeInvestmentItem = useMutation({
         mutationFn: (itemId: number) => deleteInvestmentItem(itemId),
         onSuccess: () => { invalidate(); toast.success('Investimento excluído com sucesso.') },
-        onError: () => toast.error('Falha ao excluir investimento.'),
+        onError: (err) => toast.error(extractApiError(err, 'Falha ao excluir investimento.')),
     })
 
     const addMonthCard = useMutation({
         mutationFn: (data: NewCardInvestiment) => createInvestmentMonthCard(data),
         onSuccess: () => { invalidate(); toast.success('Novo mês de referência criado!') },
-        onError: (err: any) => {
-            const msg = err.response?.data?.detail || 'Não foi possível criar o registro.'
-            toast.error(msg)
-        },
+        onError: (err) => toast.error(extractApiError(err, 'Não foi possível criar o registro.')),
     })
 
     const removeMonthCard = useMutation({
         mutationFn: (cardId: number) => deleteInvestmentMonthCard(cardId),
         onSuccess: () => { invalidate(); toast.success('Mês excluído com sucesso.') },
-        onError: () => toast.error('Falha ao excluir o mês.'),
+        onError: (err) => toast.error(extractApiError(err, 'Falha ao excluir o mês.')),
     })
 
     return {

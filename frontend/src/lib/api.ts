@@ -1,5 +1,19 @@
 import axios from 'axios';
 
+export function extractApiError(error: unknown, fallback: string): string {
+    if (!axios.isAxiosError(error)) return fallback;
+    const data = error.response?.data;
+    if (!data) return fallback;
+    if (typeof data.detail === 'string') return data.detail;
+    if (Array.isArray(data.non_field_errors)) return data.non_field_errors[0];
+    const firstField = Object.keys(data)[0];
+    if (firstField) {
+        const msg = data[firstField];
+        return Array.isArray(msg) ? msg[0] : String(msg);
+    }
+    return fallback;
+}
+
 const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
     withCredentials: true,
